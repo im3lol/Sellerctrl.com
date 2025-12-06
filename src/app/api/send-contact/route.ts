@@ -1,8 +1,6 @@
 import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 interface ContactFormData {
   name: string;
   company: string;
@@ -22,7 +20,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send email to sellerctrleg@gmail.com
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'Missing RESEND_API_KEY' },
+        { status: 500 }
+      );
+    }
+    const resend = new Resend(apiKey);
+
     const { data, error } = await resend.emails.send({
       from: 'SellerCtrl <onboarding@resend.dev>', // Will use default in dev, change for production
       to: 'sellerctrleg@gmail.com',
